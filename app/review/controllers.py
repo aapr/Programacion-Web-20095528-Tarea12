@@ -3,52 +3,96 @@ from flask import Blueprint
 from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS, cross_origin
 from app.models import Movie, Review
+import os, urlib.request
 
 review = Blueprint('review', __name__)
 
 
 @review.route('/')
 def index():
-    	return render_template('review.html')
+	return render_template('review.html')
 
-@review.route('/get', methods=['GET'])
-def data_get():
-		name = request.args.get('name')
-		result = Movie.query.filter_by(Name = name).first()
-		return result.Name + " " + result.Description + " " + result.Poster
+@review.route('/', methods=['GET'])
+def getAllReview():
+	if request.method == 'GET':
+		data = []
+		for i in Review.query.all():
+			data.append(i.serialize())
+		result = jsonify(data)
+		return result
 
-@review.route('/movie', methods=['POST'])
-def data_post():
-	if request.method == 'POST':
+@review.route('/', methods=['GET'])
+def getAllMovies():
+	if request.method == 'GET':
+		data = []
+		for i in Review.query.all():
+			data.append(i.serialize())
+		result = jsonify(data)
+		return result
+
+@review.route('/', methods=['GET'])
+def getMovieByName():
+	if request.method == 'GET':
 		name = request.form['name']
-		data = Movie.query.filter_by(Name= name).first()
 
-		if (data != None){
+		if Movie.query.filter_by(Name = name).startswith() > 0:
+			data = Movie.query.filter_by(Name = name).startswith()
+			result = jsonify(data.serialize())
+			return result
+		else:
+			return render_template('review.html')
 
-		result = (data.id, name, data.description, None)
+ 
+
 		
-		db.session.add(result)
-		db.session.commit() 
-		} 
 	return render_template('movie.html')
 
-@review.route('/review', methods=['POST'])
-def data_post():
+@review.route('/', methods=['POST'])
+def postFormData():
 	if request.method == 'POST':
 		name = request.form['name']
-		data = Movie.query.filter_by(Name= name).first()
-		
-		if ( data != None){
+
+		if Movie.query.filter_by(Name = name).count() > 0{
+			data = Movie.query.filter_by(Name = name).first()
 
 			title = request.form['reviewTitle']
 			description = request.form['Description']
 			score = request.form['movieScore']
 
-			result = Movie( name, title, description, None, score, None);
+			result = Review( title, description, score, None, None, data.id);
 
 			db.session.add(result)
 			db.session.commit()  
 		}
-		else{console.log("poop")}
-	
+		
 	return render_template('review.html')
+
+@review.route('/', methods=['POST'])
+def postFormData():
+	if request.method == 'POST':
+		name = request.form['name']
+		
+		if Movie.query.filter_by(Name = name).count() == 0{
+			
+			poster = request.form['poster']
+
+			try:
+				f = open('app/static/posters/' + name + '.jpg','wb')
+				with urllib.request.urlopen(poster) as url:
+                    s = url.read()
+				f.write(s)
+				f.close()
+				localPoster = '_' + name + '.jpg'
+			except:
+				localPoster = ''
+
+			description = request.form['Description']
+
+			result = Movie( name, description, localPoster);
+
+			db.session.add(result)
+			db.session.commit()  
+		}
+	 
+	return render_template('movie.html')
+

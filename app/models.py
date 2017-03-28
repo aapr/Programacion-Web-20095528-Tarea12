@@ -17,6 +17,14 @@ class Movie(db.Model):
 	def __repr__(self):
 		return '<Movie %r>' % (self.name)
 
+	def serie(self):
+				return {
+						'id' : self.id,
+						'name' : self.name,
+						'description' : self.description,
+						'poster' : self.poster
+                }
+
 class Review(db.Model):
 	Id = db.Column(db.Integer, primary_key=True)
 	Title = db.Column(db.String(64), index=True, unique = True)
@@ -26,7 +34,7 @@ class Review(db.Model):
 	DeviceId = db.Column(db.Integer)
 	MovieId = db.Column(db.Integer, db.ForeignKey('movie.Id'))
 
-	def __init__(self, title, desc, user, rating=0, deviceid=0):
+	def __init__(self, title, desc, rating=0, user, deviceid=0, movieid):
 		self.Title = title
 		self.Description = desc
 		self.Rating = rating
@@ -37,7 +45,7 @@ class Review(db.Model):
 	def __repr__(self):
 		return '<Review %r>' & (Review.Title)
 
-	def serie(self):
+	def serialize(self):
 				return {
 						'id' : self.Id,
 						'title' : self.Title,
