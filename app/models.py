@@ -36,3 +36,13 @@ class Review(db.Model):
 
 	def __repr__(self):
 		return '<Review %r>' & (Review.Title)
+
+	def serie(self):
+				return {
+						'id' : self.Id,
+						'title' : self.Title,
+						'description' : self.Description,
+						'rating' : self.Rating
+						'user' : self.User,
+						'deviceid' : self.DeviceId
+                }

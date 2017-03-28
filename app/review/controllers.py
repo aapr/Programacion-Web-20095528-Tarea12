@@ -17,23 +17,38 @@ def data_get():
 		result = Movie.query.filter_by(Name = name).first()
 		return result.Name + " " + result.Description + " " + result.Poster
 
-@review.route('/reviews', methods=['POST'])
+@review.route('/movie', methods=['POST'])
 def data_post():
 	if request.method == 'POST':
-		data = request.form.to_dict();
-	return data
+		name = request.form['name']
+		data = Movie.query.filter_by(Name= name).first()
 
-@review.route('/movies', methods=['POST'])
+		if (data != None){
+
+		result = (data.id, name, data.description, None)
+		
+		db.session.add(result)
+		db.session.commit() 
+		} 
+	return render_template('movie.html')
+
+@review.route('/review', methods=['POST'])
 def data_post():
-    name = request.form['name']
-	data = request.form.to_dict();
-	if (Movie.query.filter_by(name=data["title"]).first() == None){
+	if request.method == 'POST':
+		name = request.form['name']
+		data = Movie.query.filter_by(Name= name).first()
+		
+		if ( data != None){
 
-		data = Movie(data["id"], data["title"], data["description"], None);
+			title = request.form['reviewTitle']
+			description = request.form['Description']
+			score = request.form['movieScore']
 
-		db.session.add(data)
-		db.session.commit()  
-	}
-	else{console.log("poop")}
+			result = Movie( name, title, description, None, score, None);
+
+			db.session.add(result)
+			db.session.commit()  
+		}
+		else{console.log("poop")}
 	
-    return render_template('movie.html')
+	return render_template('review.html')
